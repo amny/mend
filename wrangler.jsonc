@@ -3,7 +3,12 @@
 {
   "name": "mend",
   "compatibility_date": "2026-11-01",
+  "observability": {
+    "enabled": true,
+  },
   "assets": {
     "directory": "./apps/web/dist",
   },
+  // Required by `wrangler preview` (the deploy command for non-production branches).
+  "previews": {},
 }
