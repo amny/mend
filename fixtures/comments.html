@@ -1,0 +1,24 @@
+<!-- comment before doctype -->
+<!DOCTYPE html>
+<!-- comment before html -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>コメントとテンプレート</title>
+  <!--[if lt IE 9]><script src="html5shiv.js"></script><![endif]-->
+</head>
+<body>
+  <!-- 通常のコメント -->
+  <p id="p1">コメントの<!-- 文中のコメント -->前後</p>
+  <!--[if IE]><p>IE だけに表示</p><![endif]-->
+  <![if !IE]><p id="p2">IE 以外に表示</p><![endif]>
+  <!-- 複数行の
+       コメント -- 二重ハイフンを含む -->
+  <!---->
+  <template id="tpl">
+    <p>テンプレートの中身（編集対象外）</p>
+  </template>
+  <p id="p3">テンプレートの後の段落</p>
+</body>
+</html>
+<!-- comment after html -->

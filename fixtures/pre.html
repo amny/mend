@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>空白の扱い</title>
+  <style>
+    .pw { white-space: pre-wrap; }
+    .nw { white-space: nowrap; }
+  </style>
+</head>
+<body>
+<pre id="pre1">
+pre の先頭の改行は無視される
+    4スペースのインデント
+	タブのインデント
+連続   空白&nbsp;&nbsp;と nbsp</pre>
+<pre id="pre2">
+
+先頭に改行が2つ（1つ目だけ無視される）</pre>
+<div id="pw" class="pw">pre-wrap の   連続空白
+  と改行</div>
+<p id="nw" class="nw">nowrap の   連続空白</p>
+<p id="normal">通常の   連続空白と&nbsp;nbsp</p>
+<textarea id="ta">
+textarea は編集対象外</textarea>
+</body>
+</html>

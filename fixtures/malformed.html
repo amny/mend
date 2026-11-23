@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>壊れたHTML</title>
+</head>
+<body>
+  <table>
+    表の直下のテキスト
+    <tr><td>セル1</td><td>セル2</td></tr>
+    <b>表の直下の太字</b>
+  </table>
+  <div class="unclosed">
+    <p>閉じ忘れたdivの中</p>
+  <p><b><i>入れ子違反</b>の続き</i>の文</p>
+  <p>段落の中に<div>ブロック要素</div>が入る</p>
+  </p>
+  <span>閉じ忘れたspan
+  <ul><li>リスト<p>リスト内の段落</ul>
+  <h2>見出し<h3>入れ子の見出し</h2></h3>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>スクリプトを含む</title>
+  <script>console.log("MEND_SCRIPT_RAN:head"); alert("MEND_SCRIPT_RAN:alert");</script>
+  <script type="module">console.log("MEND_SCRIPT_RAN:module");</script>
+</head>
+<body>
+  <h1>スクリプトのテスト</h1>
+  <p id="static">静的な段落。</p>
+  <div id="generated"></div>
+  <script>
+    // Contains markup-like strings that must not end the script early.
+    const html = "<p>JSで生成した段落<\/p></div>";
+    document.getElementById("generated").innerHTML = html;
+    console.log("MEND_SCRIPT_RAN:body");
+  </script>
+  <button type="button" onclick="console.log('MEND_SCRIPT_RAN:onclick')">ボタン</button>
+  <p onmouseover="console.log('MEND_SCRIPT_RAN:onmouseover')">ホバーで発火する段落。</p>
+  <img src="data:," alt="" onerror="console.log('MEND_SCRIPT_RAN:onerror')">
+  <a href="javascript:console.log('MEND_SCRIPT_RAN:href')">javascript: リンク</a>
+  <noscript><p id="noscript">スクリプト無効時の段落。</p></noscript>
+  <p id="after">スクリプトの後の段落。</p>
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mend 機能一覧</title>
+<style>
+:root {
+  --accent: #2fa39a;
+  --accent-strong: #1e7a70;
+  --accent-soft: #e6f4f2;
+  --highlight-soft: #fff8e1;
+  --highlight-border: #f0d27a;
+  --danger: #b4521c;
+  --text: #1f2a2e;
+  --muted: #5b6a6e;
+  --border: #dde3e2;
+  --surface: #ffffff;
+  --bg: #f4f6f5;
+  --code-bg: #eef1f0;
+  --font: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --accent: #4cc2b8;
+    --accent-strong: #6fd3ca;
+    --accent-soft: #17302e;
+    --highlight-soft: #2e2a1a;
+    --highlight-border: #6b5a22;
+    --danger: #e08a5a;
+    --text: #e3e9e8;
+    --muted: #9aa8a7;
+    --border: #2f3a3b;
+    --surface: #1b2223;
+    --bg: #131919;
+    --code-bg: #232c2d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --accent: #4cc2b8;
+  --accent-strong: #6fd3ca;
+  --accent-soft: #17302e;
+  --highlight-soft: #2e2a1a;
+  --highlight-border: #6b5a22;
+  --danger: #e08a5a;
+  --text: #e3e9e8;
+  --muted: #9aa8a7;
+  --border: #2f3a3b;
+  --surface: #1b2223;
+  --bg: #131919;
+  --code-bg: #232c2d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  background: var(--bg);
+}
+.page { max-width: 1040px; margin: 0 auto; padding: 40px 24px 80px; }
+header.hero { margin-bottom: 32px; }
+header.hero h1 { font-size: 30px; margin: 0 0 4px; letter-spacing: 0.02em; }
+header.hero p { margin: 0; color: var(--muted); }
+nav.toc {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  margin: 20px 0 0; padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px;
+}
+nav.toc a { color: var(--accent-strong); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+h2 {
+  font-size: 21px; margin: 48px 0 14px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--accent);
+}
+h3 { font-size: 17px; margin: 28px 0 10px; }
+p { margin: 0 0 12px; }
+code, kbd {
+  font-family: var(--mono); font-size: 0.88em;
+  background: var(--code-bg); border-radius: 4px; padding: 1px 5px;
+}
+kbd { border: 1px solid var(--border); border-bottom-width: 2px; }
+.muted { color: var(--muted); }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px;
+}
+.card h4 { margin: 0 0 6px; font-size: 15px; color: var(--accent-strong); }
+.card p { margin: 0; font-size: 14px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+th { background: var(--code-bg); font-weight: 600; white-space: nowrap; }
+td.id { font-family: var(--mono); white-space: nowrap; color: var(--accent-strong); font-weight: 600; }
+td.loc { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.tag {
+  display: inline-block; font-size: 12px; padding: 0 8px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent-strong); white-space: nowrap;
+}
+.feature {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px 18px; margin: 0 0 12px;
+}
+.feature-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.feature-head .fid { font-family: var(--mono); font-weight: 700; color: var(--accent-strong); }
+.feature-head h4 { margin: 0; font-size: 16px; }
+.feature-head .where { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.feature ul { margin: 6px 0 0; padding-left: 1.3em; }
+.feature li { margin: 2px 0; }
+.note {
+  background: var(--highlight-soft); border: 1px solid var(--highlight-border);
+  border-radius: 8px; padding: 10px 14px; font-size: 14px; margin: 12px 0;
+}
+.pipeline { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 12px 0 8px; }
+.step {
+  flex: 1 1 150px; background: var(--surface); border: 1px solid var(--border);
+  border-top: 3px solid var(--accent); border-radius: 6px; padding: 10px 12px; font-size: 13.5px;
+}
+.step b { display: block; font-size: 14px; margin-bottom: 2px; }
+.step code { font-size: 12px; }
+.step.stop { border-top-color: var(--danger); }
+.arch { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.arch .card h4 { font-family: var(--mono); }
+.arch ul { margin: 6px 0 0; padding-left: 1.2em; font-size: 13.5px; }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.shots figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.shots img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--border); }
+.shots figcaption { padding: 8px 12px; font-size: 13px; color: var(--muted); }
+footer { margin-top: 56px; font-size: 13px; color: var(--muted); }
+@media (max-width: 600px) {
+  .page { padding: 24px 16px 60px; }
+  header.hero h1 { font-size: 24px; }
+  .feature-head .where { margin-left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <h1>Mend 機能一覧</h1>
+  <p>AIが出力したHTMLを、独自形式に変換せずそのまま編集するエディタ。ソースコードから機能と仕組みを整理したもの。</p>
+  <nav class="toc" aria-label="目次">
+    <a href="#overview">概要</a>
+    <a href="#arch">構成</a>
+    <a href="#list">機能一覧</a>
+    <a href="#file">ファイル操作</a>
+    <a href="#view">表示</a>
+    <a href="#edit">テキスト編集</a>
+    <a href="#save">保存処理</a>
+    <a href="#safety">安全装置</a>
+    <a href="#keys">キーボード操作</a>
+    <a href="#limits">編集できない範囲・制約</a>
+    <a href="#api">パッケージ別 API</a>
+  </nav>
+</header>
+
+<section id="overview">
+  <h2>概要</h2>
+  <p>Mend は「開く、文字を直す、保存する」で完結する HTML エディタ。元の HTML 文字列だけを正本とし、変更したテキストだけをソースに書き戻すことで、編集していない部分を1バイトも変えずに保存する。</p>
+  <div class="principles">
+    <div class="card"><h4>元の文字列が正本</h4><p>画面上の DOM を書き出さない。保存は <code>{ start, end, text }</code> のパッチを元ソースに当てて作る。</p></div>
+    <div class="card"><h4>編集していない所は不変</h4><p>実体参照・改行コード・BOM・空白などの表記は、変更範囲の中でも元のまま残す。</p></div>
+    <div class="card"><h4>検証に通らなければ書かない</h4><p>新ソースを再パースして元の木と突き合わせ、一致しなければ保存を中止する。迷ったら編集不可の側に倒す。</p></div>
+    <div class="card"><h4>スクリプトは実行しない</h4><p>編集ビューは <code>sandbox="allow-same-origin"</code> の iframe。元の HTML に属性やタグを足さない。</p></div>
+  </div>
+
+  <h3>画面</h3>
+  <div class="shots">
+    <figure><img src="screens/start.png" alt="起動画面"><figcaption>起動画面：ドロップ先、ファイルを開く、最近開いたファイル</figcaption></figure>
+    <figure><img src="screens/editor.png" alt="編集画面"><figcaption>編集画面：変更箇所一覧、編集ビュー、ステータスバー</figcaption></figure>
+    <figure><img src="screens/dialogs.png" alt="ダイアログ"><figcaption>ダイアログ：保存中止、外部更新、未保存警告など</figcaption></figure>
+  </div>
+</section>
+
+<section id="arch">
+  <h2>構成</h2>
+  <div class="arch">
+    <div class="card">
+      <h4>packages/core</h4>
+      <p>DOM に依存しない純粋なロジック（Vitest）。</p>
+      <ul>
+        <li>UTF-8 の厳密なデコード、BOM の記録と復元</li>
+        <li>parse5 による解析とテキストレコード生成</li>
+        <li>テキスト位置 ↔ ソース位置の対応表</li>
+        <li>差分（Myers）からパッチ生成・適用</li>
+        <li>保存前検証、保存後の正本の再構築</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>packages/editor</h4>
+      <p>iframe 上の編集（Playwright で E2E）。副作用はここに閉じ込める。</p>
+      <ul>
+        <li>blob URL による iframe 表示</li>
+        <li>構造ガード（事前防止＋事後巻き戻し）、IME</li>
+        <li>自前の Undo / Redo 履歴</li>
+        <li>変更一覧、検索、強調表示、ホバー枠</li>
+        <li>保存後の再同期、意図しない遷移からの復帰</li>
+        <li>スクリプト有効のプレビュー</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>apps/web</h4>
+      <p>React の画面と File System Access API。</p>
+      <ul>
+        <li>起動画面・編集画面・ダイアログ・トースト</li>
+        <li>FileAdapter（開く・上書き・別名保存・外部更新の検知）</li>
+        <li>最近開いたファイル（IndexedDB）</li>
+        <li>日本語の UI 文言、テスト用フック</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>保存の流れ</h3>
+  <div class="pipeline">
+    <div class="step"><b>1. 変更の収集</b>変更済みテキストノードの現在値（行）を集める <code>editor.prepareSave</code></div>
+    <div class="step"><b>2. パッチ生成</b>差分から置換範囲を求め、元の表記を残して符号化 <code>encodeLines</code></div>
+    <div class="step"><b>3. パッチ適用</b>重なりを確認して後ろから適用 <code>applyPatches</code></div>
+    <div class="step"><b>4. 保存前検証</b>再パースして元の木と突き合わせ <code>verifySave</code></div>
+    <div class="step"><b>5. 書き込み</b>外部更新を確認してから書き込み <code>FileAdapter.save</code></div>
+    <div class="step"><b>6. 再同期</b>新ソースを正本にし対応表だけ張り直す <code>editor.commitSave</code></div>
+  </div>
+  <p class="muted">2〜4 のどこかで失敗すると、ファイルには書き込まずに理由をダイアログで示す。</p>
+</section>
+
+<section id="list">
+  <h2>機能一覧</h2>
+  <p class="muted">ID は <code>docs/requirements.md</code> の機能要件に対応。ID のないものは実装上の補助機能。</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>ID</th><th>分類</th><th>機能</th><th>概要</th><th>主な実装</th></tr></thead>
+    <tbody>
+      <tr><td class="id">F-01</td><td><span class="tag">ファイル</span></td><td>開く</td><td>ファイル選択・ドラッグ＆ドロップで開く。UTF-8 を厳密にデコード</td><td class="loc">fileAdapter.ts, App.tsx</td></tr>
+      <tr><td class="id">F-02</td><td><span class="tag">ファイル</span></td><td>上書き保存</td><td>開いたファイルハンドルへ書き込む（Ctrl+S）</td><td class="loc">fileAdapter.ts</td></tr>
+      <tr><td class="id">F-03</td><td><span class="tag">ファイル</span></td><td>別名で保存</td><td>新しいファイルへ保存し、以降の保存先を切り替える（Ctrl+Shift+S）</td><td class="loc">fileAdapter.ts</td></tr>
+      <tr><td class="id">F-04</td><td><span class="tag">ファイル</span></td><td>未保存警告</td><td>タイトルに「●」、別ファイルを開く・戻る・タブを閉じる前に確認</td><td class="loc">App.tsx</td></tr>
+      <tr><td class="id">F-05</td><td><span class="tag">ファイル</span></td><td>外部更新の検知</td><td>保存前に更新日時を比べ、変わっていれば上書き・別名・キャンセルを選ばせる</td><td class="loc">EditorScreen.tsx</td></tr>
+      <tr><td class="id">F-06</td><td><span class="tag">ファイル</span></td><td>最近開いたファイル</td><td>最大10件を IndexedDB に保存し、起動画面に名前と日付を表示</td><td class="loc">recentFiles.ts</td></tr>
+      <tr><td class="id">V-01</td><td><span class="tag">表示</span></td><td>編集ビュー</td><td>スクリプト無効の sandbox iframe に元 HTML を表示</td><td class="loc">editor.ts</td></tr>
+      <tr><td class="id">V-02</td><td><span class="tag">表示</span></td><td>プレビュー</td><td>パッチ適用後のソースをスクリプト有効・読み取り専用で表示</td><td class="loc">preview.ts</td></tr>
+      <tr><td class="id">V-03</td><td><span class="tag">表示</span></td><td>編集可能範囲の明示</td><td>編集できるテキストの要素にホバー枠と要素名ラベル</td><td class="loc">overlay.ts</td></tr>
+      <tr><td class="id">V-04</td><td><span class="tag">表示</span></td><td>変更・検索の強調</td><td>Highlight API で変更済み文字と検索一致を着色</td><td class="loc">editor.ts</td></tr>
+      <tr><td class="id">E-01</td><td><span class="tag">編集</span></td><td>文字の挿入・削除</td><td>テキストノード内の入力・削除、日本語 IME</td><td class="loc">editor.ts</td></tr>
+      <tr><td class="id">E-02</td><td><span class="tag">編集</span></td><td>構造変更のブロック</td><td>段落分割・要素をまたぐ削除・装飾・D&amp;D を止める／巻き戻す</td><td class="loc">editor.ts, revert.ts</td></tr>
+      <tr><td class="id">E-03</td><td><span class="tag">編集</span></td><td>貼り付け</td><td>プレーンテキストとして挿入、改行はスペースへ</td><td class="loc">editor.ts, textRange.ts</td></tr>
+      <tr><td class="id">E-04</td><td><span class="tag">編集</span></td><td>Undo / Redo</td><td>テキストノード単位の自前履歴。保存をまたいで戻せる</td><td class="loc">history.ts</td></tr>
+      <tr><td class="id">E-05</td><td><span class="tag">編集</span></td><td>検索</td><td>Ctrl+F で検索、件数表示、前後の一致へ移動</td><td class="loc">SearchBar.tsx, textRange.ts</td></tr>
+      <tr><td class="id">E-06</td><td><span class="tag">編集</span></td><td>変更箇所一覧と個別の取り消し</td><td>サイドパネルに変更前後を一覧、クリックで移動、1件ずつ戻す</td><td class="loc">ChangeList.tsx</td></tr>
+      <tr><td class="id">E-07</td><td><span class="tag">編集</span></td><td><code>&lt;br&gt;</code> による改行</td><td>Shift+Enter で <code>&lt;br&gt;</code> を挿入（改行が表示される要素では改行文字）</td><td class="loc">editor.ts, encodeEdit.ts</td></tr>
+      <tr><td class="id">S-01</td><td><span class="tag">保存</span></td><td>パッチ生成</td><td>文字単位の差分からソース上の置換範囲を作る</td><td class="loc">encodeEdit.ts, diff.ts</td></tr>
+      <tr><td class="id">S-02</td><td><span class="tag">保存</span></td><td>パッチ適用</td><td>範囲チェックのうえ後ろから順に適用</td><td class="loc">patch.ts</td></tr>
+      <tr><td class="id">S-03</td><td><span class="tag">保存</span></td><td>保存前検証</td><td>再パースした木と期待値を比較し、不一致なら保存中止</td><td class="loc">verify.ts</td></tr>
+      <tr><td class="id">S-04</td><td><span class="tag">保存</span></td><td>保存後フック</td><td><code>afterSave(old, new, meta)</code>。MVP では空実装</td><td class="loc">fileAdapter.ts</td></tr>
+      <tr><td class="id">S-05</td><td><span class="tag">保存</span></td><td>保存後の再同期</td><td>iframe を読み込み直さず、対応表と履歴だけを張り直す</td><td class="loc">save.ts, mapping.ts</td></tr>
+      <tr><td class="id">—</td><td><span class="tag">安全</span></td><td>読み取り専用への切り替え</td><td>解析と DOM の不一致などで編集を止め、理由をバナー表示</td><td class="loc">editor.ts, messages.ts</td></tr>
+      <tr><td class="id">—</td><td><span class="tag">安全</span></td><td>意図しない遷移からの復帰</td><td>iframe が別ページへ移ったら読み込み直して編集内容を引き継ぐ</td><td class="loc">editor.ts, mapping.ts</td></tr>
+      <tr><td class="id">—</td><td><span class="tag">補助</span></td><td>ステータスバー</td><td>モード、文字コード・改行コード、編集不可テキスト数、カーソル位置</td><td class="loc">EditorScreen.tsx, format.ts</td></tr>
+      <tr><td class="id">—</td><td><span class="tag">補助</span></td><td>テスト用フック</td><td>次の保存の検証を意図的に失敗させる（AC-08 用、テストビルドのみ）</td><td class="loc">testHooks.ts, save.ts</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="file">
+  <h2>ファイル操作</h2>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-01</span><h4>開く</h4><span class="where">apps/web/src/lib/fileAdapter.ts · App.tsx · StartScreen.tsx</span></div>
+    <ul>
+      <li>起動画面の「ファイルを開く」（<kbd>Ctrl+O</kbd>）で <code>showOpenFilePicker</code> を開く。対象は <code>.html</code> / <code>.htm</code>。</li>
+      <li>起動画面のドロップ先、または編集画面全体へのドラッグ＆ドロップで開ける。ファイルハンドルが取れればそれを使い、取れなければ <code>File</code> だけで開く（このときは保存先が決まらないので、保存は常に別名保存になる）。フォルダのドロップはエラー。</li>
+      <li>UTF-8 を <code>fatal</code> でデコードし、不正なバイト列があれば開かない。Shift_JIS など別の文字コードの可能性をダイアログで伝える。</li>
+      <li>BOM の有無を記録し、保存時に同じ状態で書き戻す。</li>
+      <li>読み取り権限がなければ確認を出し、拒否されたら理由を表示する。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-02</span><h4>上書き保存</h4><span class="where">fileAdapter.ts · EditorScreen.tsx</span></div>
+    <ul>
+      <li>「保存」ボタンまたは <kbd>Ctrl+S</kbd>（iframe にフォーカスがあっても有効）。</li>
+      <li>書き込み権限を確認し、<code>createWritable</code> で一時ファイルに書いてから置き換える。途中で失敗したらストリームを破棄し、元ファイルは変えない。</li>
+      <li>成功するとトーストで「変更 N箇所。それ以外の部分は元のファイルと一致しています。」を表示。変更がなければ元と同じ内容で保存したと示す。</li>
+      <li>保存中は保存ボタンを無効にし、二重実行を防ぐ。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-03</span><h4>別名で保存</h4><span class="where">fileAdapter.ts</span></div>
+    <ul>
+      <li>「別名で保存」ボタンまたは <kbd>Ctrl+Shift+S</kbd>。<code>showSaveFilePicker</code> で元ファイルと同じ場所・同じ名前を初期値にする。</li>
+      <li>保存後は新しいファイルが以降の上書き先になり、ヘッダーのファイル名も切り替わる。キャンセル時は何もしない。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-04</span><h4>未保存警告</h4><span class="where">App.tsx</span></div>
+    <ul>
+      <li>未保存の変更があると、ウィンドウタイトルに「● ファイル名 - Mend」、ヘッダーに「未保存の変更 N件」を表示。</li>
+      <li>別ファイルを開く・ドロップする・ロゴで起動画面に戻るときは「保存されていない変更があります」で確認（キャンセル／変更を破棄して続ける）。</li>
+      <li>タブを閉じる・再読み込みするときはブラウザ標準の <code>beforeunload</code> 確認を出す。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-05</span><h4>外部更新の検知</h4><span class="where">fileAdapter.ts <code>modifiedOnDisk</code> · EditorScreen.tsx</span></div>
+    <ul>
+      <li>上書き保存の直前に、ディスク上の <code>lastModified</code> を開いた時点（または前回保存時点）と比べる。</li>
+      <li>変わっていれば「ファイルが別の場所で更新されています」を出し、キャンセル／別名で保存／上書きするを選ばせる。検証済みのソースはそのまま使う。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">F-06</span><h4>最近開いたファイル</h4><span class="where">apps/web/src/lib/recentFiles.ts · format.ts</span></div>
+    <ul>
+      <li>ファイルハンドルを IndexedDB（DB <code>mend</code>、ストア <code>recent-files</code>）に保存。<code>isSameEntry</code> で重複をまとめ、最大10件。</li>
+      <li>起動画面に名前と最後に開いた日（「今日」「昨日」「11月12日」、別の年は年付き）を新しい順に表示。フォルダのパスはブラウザから取れないため出さない。</li>
+      <li>開き直すときは改めて読み取り権限を求める。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="view">
+  <h2>表示</h2>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">V-01</span><h4>編集ビュー</h4><span class="where">packages/editor/src/editor.ts</span></div>
+    <ul>
+      <li>元のソースを blob URL にして、<code>sandbox="allow-same-origin"</code>（<code>allow-scripts</code> なし）の iframe に読み込み、<code>designMode</code> で編集可能にする。スクリプトは実行されず、CSS は元のまま効く。</li>
+      <li>srcdoc ではなく blob URL を使うのは、doctype のない文書で parse5 とブラウザの描画モードを一致させるため。</li>
+      <li>読み込み後、iframe の DOM と parse5 の木を並行に走査し、テキストノードとレコードの対応表を作る（<code>mapping.ts</code>）。一致しなければ文書全体を読み取り専用にする。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">V-02</span><h4>プレビュー</h4><span class="where">packages/editor/src/preview.ts</span></div>
+    <ul>
+      <li>ヘッダーの「編集／プレビュー」で切り替える。プレビューは <code>sandbox="allow-scripts"</code> のみ（同一オリジンなし）の iframe で、スクリプトが動く読み取り専用表示。</li>
+      <li>表示するのは「今の変更を当てて検証まで通したソース」。ファイルには書かない。検証に通らない場合はプレビューを作らず理由を表示する。</li>
+      <li>ステータスバーは「編集モード：スクリプト無効」「プレビュー：スクリプト有効」を切り替えて表示。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">V-03</span><h4>編集可能範囲の明示（ホバー枠）</h4><span class="where">packages/editor/src/overlay.ts</span></div>
+    <ul>
+      <li>編集できるテキストの上にマウスを乗せると、その要素に薄い枠と要素名（例：<code>p.lead</code>）のラベルを出す。上に余白がなければラベルを枠の内側に置く。</li>
+      <li>枠は親ページ側に重ねた層で描き、iframe の DOM にはノードを足さない。<code>script</code> / <code>style</code> など編集対象外には反応しない。スクロールすると消える。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">V-04</span><h4>変更箇所・検索結果の強調</h4><span class="where">editor.ts（Highlight API）</span></div>
+    <ul>
+      <li>未保存の変更で実際に変わった文字の範囲を黄色、検索一致を薄い緑、現在の一致を濃い緑で強調する。</li>
+      <li>CSS Custom Highlight API を使い、スタイルは iframe の <code>adoptedStyleSheets</code> で与える。DOM にノードも属性も足さない。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="edit">
+  <h2>テキスト編集</h2>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-01</span><h4>文字の挿入・削除（IME 対応）</h4><span class="where">editor.ts</span></div>
+    <ul>
+      <li>既存のテキストノードの中で、入力・BackSpace・Delete・選択範囲の置き換えができる。</li>
+      <li>選択範囲の置き換えやテキストを空にする削除は、Chrome にノードを消させないよう自前で <code>data</code> を書き換える（空にしても要素は残り、<code>&lt;br&gt;</code> は入らない）。</li>
+      <li>IME の変換中（<code>compositionstart</code>〜<code>compositionend</code>）は構造チェックを保留し、確定後にまとめて判定して1つの Undo 単位にする。</li>
+      <li>カーソル位置は「見出し › 要素」の形でステータスバーに表示する。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-02</span><h4>構造変更のブロック</h4><span class="where">editor.ts（beforeinput / MutationObserver）· revert.ts</span></div>
+    <p>「事前に止める」と「事後に巻き戻す」の二段構え。</p>
+    <ul>
+      <li><b>事前防止</b>：<code>beforeinput</code> で <code>insertParagraph</code>（Enter）・リスト／水平線／リンクの挿入・<code>format*</code>（装飾）・ドロップ・ドラッグ削除などを止める。<kbd>Ctrl+B</kbd> / <kbd>I</kbd> / <kbd>U</kbd> も無効。</li>
+      <li>削除は <code>getTargetRanges()</code> を見て、範囲が複数のノードにまたがる場合は止める。</li>
+      <li><b>事後の巻き戻し</b>：<code>MutationObserver</code> で、対応表にあるテキストの変更だけを受け入れる。要素の増減や属性の変更は記録を逆順に逆適用して元に戻す。戻せなかった場合は編集を止める（保存は可能）。</li>
+      <li>改行が表示される要素（<code>white-space: pre</code> / <code>pre-wrap</code> / <code>pre-line</code> / <code>break-spaces</code>）の中では、Enter と Shift+Enter で改行文字を入れる。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-03</span><h4>貼り付け</h4><span class="where">editor.ts · textRange.ts <code>flattenLineBreaks</code></span></div>
+    <ul>
+      <li>クリップボードの <code>text/plain</code> だけを使い、装飾は捨てる。</li>
+      <li>改行はスペースに置き換える（要素を増やさない）。改行が表示される要素の中では改行のまま入れる。</li>
+      <li>貼り付けは1回で1つの Undo 単位になる。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-04</span><h4>Undo / Redo</h4><span class="where">packages/editor/src/history.ts</span></div>
+    <ul>
+      <li>ブラウザ標準の Undo は使わず、<kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> / <kbd>Ctrl+Shift+Z</kbd> と <code>historyUndo</code> / <code>historyRedo</code> を横取りして自前の履歴を使う。ヘッダーにもボタンがある。</li>
+      <li>履歴はソース上の位置ではなく「テキストノードと変更前・変更後の値」で持つ純粋なデータ。種類は入力・IME・貼り付け・取り消し・<code>&lt;br&gt;</code> の挿入削除・グループ。</li>
+      <li>同じノードへの連続入力は 500ms 以内ならまとめる。Undo/Redo の直後はまとめない。</li>
+      <li>保存しても履歴は消えず、保存をまたいで戻せる（保存済みの <code>&lt;br&gt;</code> の挿入・削除は除く）。</li>
+      <li>Undo 後はカーソルを変わった位置に置く。すべて Undo して保存すると元とバイト一致する。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-05</span><h4>検索</h4><span class="where">SearchBar.tsx · textRange.ts <code>findMatches</code></span></div>
+    <ul>
+      <li><kbd>Ctrl+F</kbd> または検索ボタンで検索バーを開く（プレビュー中なら編集ビューに切り替わる）。</li>
+      <li>ASCII の大文字小文字を区別せず、テキストノードをまたぐ一致も見つける。<code>head</code> / <code>script</code> / <code>style</code> / <code>template</code> / <code>textarea</code> / <code>title</code> の中は対象外。</li>
+      <li>「現在 / 総数」の件数を表示。<kbd>Enter</kbd> で次、<kbd>Shift+Enter</kbd> で前、<kbd>Esc</kbd> で閉じる。一致箇所へスクロールする。</li>
+      <li>編集でテキストが動いたら検索し直す。置換は未対応（将来）。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-06</span><h4>変更箇所一覧と個別の取り消し</h4><span class="where">ChangeList.tsx · editor.ts <code>revealChange</code> / <code>revertChange</code></span></div>
+    <ul>
+      <li>左のサイドパネルに、未保存の変更をテキストノード単位で文書順に表示する。場所（例：「1. 背景と目的 › .card › p」）、変更前（取り消し線）、変更後。</li>
+      <li>見えない文字を可視化する：U+00A0 は「⍽」、改行は「↵」、空は「（空）」。</li>
+      <li>項目をクリックすると該当箇所へスクロールし、カーソルを変更位置に置く。</li>
+      <li>「この変更を戻す」でその箇所だけ保存済みの値に戻す。取り消し自体も Undo 履歴に積む（<code>&lt;br&gt;</code> を含む場合はグループで1手）。</li>
+      <li>パネル下部に「保存時に、変更した文字以外が元のファイルと1文字も違わないことを確認します。」と表示。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">E-07</span><h4><code>&lt;br&gt;</code> による改行</h4><span class="where">editor.ts <code>insertBreak</code> / <code>joinLines</code> · encodeEdit.ts <code>encodeLines</code></span></div>
+    <ul>
+      <li>改行が表示されない要素で <kbd>Shift+Enter</kbd> を押すと、カーソル位置でテキストを分けて <code>&lt;br&gt;</code> を入れる。分けた各テキストは同じレコードの「行」として扱う。</li>
+      <li>消せるのは自分で入れた未保存の <code>&lt;br&gt;</code> だけ。行頭の BackSpace・行末の Delete で前後の行をつなぐ。元のファイルにある <code>&lt;br&gt;</code> は消せない。</li>
+      <li>書き方はファイル内の既存の書き方（<code>&lt;br/&gt;</code>、<code>&lt;br /&gt;</code>、<code>&lt;BR&gt;</code>）に合わせ、なければ <code>&lt;br&gt;</code>。</li>
+      <li>空の行には DOM 上だけゼロ幅スペースを置いてカーソルを置けるようにする（保存・変更一覧・履歴には含めない）。</li>
+      <li>保存すると <code>&lt;br&gt;</code> はファイルの一部になり、以降は Undo で消せない。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="save">
+  <h2>保存処理</h2>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">S-01</span><h4>パッチ生成</h4><span class="where">packages/core/src/encodeEdit.ts · diff.ts · decodeText.ts</span></div>
+    <ul>
+      <li>解析時に、各テキストノードのソースを HTML トークナイザと同じ規則で読み直し、DOM 上の位置（UTF-16）→ソース上の位置の対応表（セグメント）を作る。文字参照と CR/CRLF は分割できない単位として扱う。</li>
+      <li>元の値と現在の値の共通接頭辞・接尾辞を除いて変更範囲を求め、文字参照とサロゲートペアの区切りに合わせる。その中で Myers 差分を取り、変わっていない文字は元の表記（<code>&amp;nbsp;</code> など）を残す。</li>
+      <li>新しく入力した文字は <code>&amp;</code> と <code>&lt;</code> だけエスケープする。</li>
+      <li>Chrome が入れる U+00A0 は、新しい文字に限り単独なら通常スペースに戻し、連続スペースのときだけ <code>&amp;nbsp;</code> にする（<code>pre</code> 系の中ではそのまま）。</li>
+      <li>新しい改行は、そのテキスト内・直前・直後にあるソースの改行コード（CRLF / LF / CR）で書く。どこにもなければ LF。</li>
+      <li>前後とつながって別の文字参照やタグに化ける場合（例：<code>&amp;not</code> の後に <code>in;</code>）は、先頭1文字を数値文字参照で書く。<code>pre</code> 等の先頭で消される改行も参照で書く。</li>
+      <li>安全に書き戻せない場合は例外にして保存を止める。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">S-02</span><h4>パッチ適用</h4><span class="where">packages/core/src/patch.ts</span></div>
+    <ul>
+      <li>パッチ <code>{ start, end, text }</code> の範囲外・重なり（同じ位置への2つの挿入を含む）を検出したら例外。</li>
+      <li>後ろから順に適用し、前のオフセットを保つ。<code>mapOffset</code> で旧ソースの位置を新ソースへ写す。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">S-03</span><h4>保存前検証</h4><span class="where">packages/core/src/verify.ts · SaveErrorDialog</span></div>
+    <ul>
+      <li>新ソースを同じ設定（<code>sourceCodeLocationInfo: true</code>, <code>scriptingEnabled: false</code>）で再パースし、元の木と並行に比べる。</li>
+      <li>比べるもの：パッチ範囲外のソース文字列、描画モード（quirks 等）、子の数、ノード種別、タグ名、属性（名前・値・順序・名前空間）、テキスト、コメント、doctype、<code>&lt;template&gt;</code> の中身。</li>
+      <li>変更したテキストは書き戻し規則を当てた期待値と比べる。新しい <code>&lt;br&gt;</code> は期待値側に入れて比べる。空にしたテキストノードは再解析した木になくてよい。</li>
+      <li>不一致は最大20件まで CSS 風のパス（例：<code>section:nth-of-type(2) › table › tbody</code>）付きで返す。</li>
+      <li>失敗すると「保存を中止しました」ダイアログで理由と最初の不一致を示し、「該当箇所を表示」でその要素へスクロールできる。ファイルは書き換えない。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">S-04</span><h4>保存後フック</h4><span class="where">fileAdapter.ts <code>AfterSaveHook</code> · main.tsx</span></div>
+    <ul>
+      <li>書き込みに成功するたびに <code>afterSave(oldSource, newSource, { name })</code> を呼ぶ。将来の Git 履歴用で、MVP では空の実装。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">S-05</span><h4>保存後の再同期</h4><span class="where">save.ts（rebase）· editor.ts <code>commitSave</code> · mapping.ts</span></div>
+    <ul>
+      <li>iframe は読み込み直さない。保存したソースを新しい正本として解析し直し、今の DOM と並行走査して対応表だけを張り直す。</li>
+      <li>中身を全部消したテキストノードは DOM にだけ残るので「仮想レコード」として残し、同じ ID・順序を保つ。<code>&lt;br&gt;</code> で分けたテキストは行ごとのノードに展開する。</li>
+      <li>Undo 履歴・スクロール位置・カーソル位置は保持する。保存中に入力された値も失わないよう、構造だけを比べる。</li>
+      <li>張り直しに失敗した場合は、ファイルは保存済みのまま編集を止め、開き直すよう案内する。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="safety">
+  <h2>安全装置</h2>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">—</span><h4>読み取り専用への切り替え</h4><span class="where">editor.ts <code>ReadOnlyReason</code> · messages.ts</span></div>
+    <p>次の場合は編集を止め、編集ビューの上にバナーで理由を表示する。ステータスバーは「読み取り専用」になり、変更一覧の「この変更を戻す」も隠れる。</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>理由コード</th><th>状況</th><th>保存</th></tr></thead>
+      <tbody>
+        <tr><td class="id">mapping-mismatch</td><td>ブラウザの表示と解析結果が一致しない（開いた時点）</td><td>変更なし</td></tr>
+        <tr><td class="id">guard-failed</td><td>編集で崩れた構造を元に戻せなかった</td><td>可</td></tr>
+        <tr><td class="id">resync-failed</td><td>保存後の対応づけに失敗した</td><td>保存済み（開き直しが必要）</td></tr>
+        <tr><td class="id">navigated</td><td>iframe が別ページへの移動を繰り返した、または読み込み直せなかった</td><td>未保存の変更は可</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">—</span><h4>意図しない遷移からの復帰</h4><span class="where">editor.ts · mapping.ts <code>restoreVirtualTexts</code> · history.ts <code>mapNodes</code></span></div>
+    <ul>
+      <li>編集用 iframe が別の文書を読み込んだら、元の文書を読み込み直し、編集内容と Undo 履歴を新しいノードへ引き継ぐ。</li>
+      <li>読み込み直しが終わるまでは古い文書を正本として扱い、保存と Undo を続けられる。</li>
+      <li>10秒以内に3回を超えて遷移した場合は、無限に読み込み直さず編集を止める。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">—</span><h4>ステータスバー</h4><span class="where">EditorScreen.tsx · format.ts</span></div>
+    <ul>
+      <li>モード（編集／プレビュー／読み取り専用）、文字コードと改行コード（例：「UTF-8（BOM付き） ／ CRLF」、混在も表示）、編集できないテキストの箇所数、カーソル位置。</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <div class="feature-head"><span class="fid">—</span><h4>テスト用フック（AC-08）</h4><span class="where">apps/web/src/testHooks.ts · save.ts <code>fault</code></span></div>
+    <ul>
+      <li><code>VITE_MEND_TEST_HOOKS=1</code> のときだけ <code>window.__mendTestHooks.failNextSave()</code> を公開する。次の保存でパッチを壊し、検証で必ず失敗させる。本番ビルドには含めない。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="keys">
+  <h2>キーボード操作</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>キー</th><th>動作</th><th>補足</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl+O</kbd></td><td>ファイルを開く</td><td>未保存の変更があれば確認</td></tr>
+      <tr><td><kbd>Ctrl+S</kbd></td><td>上書き保存</td><td>ハンドルがなければ別名保存</td></tr>
+      <tr><td><kbd>Ctrl+Shift+S</kbd></td><td>別名で保存</td><td></td></tr>
+      <tr><td><kbd>Ctrl+F</kbd></td><td>検索バーを開く</td><td>開いていれば入力欄を選択し直す</td></tr>
+      <tr><td><kbd>Ctrl+Z</kbd></td><td>元に戻す</td><td>検索欄にフォーカスがあるときは入力欄の操作</td></tr>
+      <tr><td><kbd>Ctrl+Y</kbd> / <kbd>Ctrl+Shift+Z</kbd></td><td>やり直す</td><td></td></tr>
+      <tr><td><kbd>Shift+Enter</kbd></td><td><code>&lt;br&gt;</code> を挿入</td><td>改行が表示される要素では改行文字</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>無効</td><td>改行が表示される要素では改行文字</td></tr>
+      <tr><td><kbd>Ctrl+B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>無効</td><td>装飾は加えない</td></tr>
+      <tr><td><kbd>Enter</kbd> / <kbd>Shift+Enter</kbd> / <kbd>Esc</kbd></td><td>次の一致 / 前の一致 / 閉じる</td><td>検索欄の中</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted">Mac では <kbd>Ctrl</kbd> の代わりに <kbd>⌘</kbd> も使える。iframe 内で押したキーも親ページへ伝えて同じ動作にする。</p>
+</section>
+
+<section id="limits">
+  <h2>編集できない範囲・制約</h2>
+  <h3>編集できないテキスト</h3>
+  <p>解析時に各テキストノードへ状態（<code>TextRecordStatus</code>）を付け、<code>editable</code> 以外は編集を受け付けない。</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>状態</th><th>対象</th></tr></thead>
+    <tbody>
+      <tr><td class="id">excluded-context</td><td><code>head</code>, <code>script</code>, <code>style</code>, <code>template</code>, <code>textarea</code>, <code>title</code>, <code>xmp</code>, <code>iframe</code>, <code>noembed</code>, <code>noframes</code>, <code>plaintext</code>, <code>select</code>, <code>option</code>, <code>optgroup</code>, <code>button</code> の中、および SVG・MathML など HTML 以外の名前空間</td></tr>
+      <tr><td class="id">whitespace</td><td>ASCII の空白だけのテキストノード</td></tr>
+      <tr><td class="id">mapping-mismatch</td><td>ソースから復元した文字列が parse5 の値と一致しないもの（例：<code>&lt;table&gt;</code> 直下のテキスト、NUL を含むもの）。件数はステータスバーに表示</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>既知の制約</h3>
+  <div class="note">詳細と確認手順は <code>docs/known-limitations.md</code> と <code>docs/manual-tests.md</code> を参照。</div>
+  <ul>
+    <li>中身を全部消した要素はクリックできなくなる。Undo か「この変更を戻す」で戻す。</li>
+    <li>壊れた HTML（入れ子違反など）でテキストを全部消すと、検証に通らず保存できないことがある。1文字でも残せば保存できる。</li>
+    <li>段落末尾に入れた <code>&lt;br&gt;</code> の後に何も入力しないと、ブラウザ上では空行として表示されない。</li>
+    <li>保存した <code>&lt;br&gt;</code> は元からある <code>&lt;br&gt;</code> と同じ扱いになり、Undo でも消せない。</li>
+    <li>ドロップでファイルハンドルが得られないと、保存は常に別名保存になる。</li>
+    <li>プレビューでは <code>alert()</code> などのダイアログは出ず、外部 CSS・画像などの相対パスは解決されない。</li>
+    <li>SVG 内のテキストの編集、置換、空要素へのクリック用の枠は将来の候補。</li>
+  </ul>
+</section>
+
+<section id="api">
+  <h2>パッケージ別 API</h2>
+
+  <h3>@mend/core</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>関数</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>decodeUtf8(bytes)</code> / <code>encodeUtf8(source, hasBom)</code></td><td>厳密な UTF-8 の変換。BOM を除いた文字列と BOM の有無を返し、書き戻しで復元する</td></tr>
+      <tr><td><code>parseDocument(source)</code></td><td>parse5 で解析し、文書の木とテキストレコード（値・ソース範囲・セグメント・状態・場所ラベルなど）を作る</td></tr>
+      <tr><td><code>encodeEdit</code> / <code>encodeLines</code></td><td>1つのテキストノードの新しい値（または <code>&lt;br&gt;</code> で分けた行）をパッチにする</td></tr>
+      <tr><td><code>normalizeEditedValue</code></td><td>保存後に DOM が持つべき値（U+00A0 の規則を当てた値）を求める</td></tr>
+      <tr><td><code>lineBreakMarkup(source)</code></td><td>ファイル内の既存の <code>&lt;br&gt;</code> の書き方を調べる</td></tr>
+      <tr><td><code>applyPatches</code> / <code>mapOffset</code></td><td>パッチの適用と、旧→新オフセットの変換</td></tr>
+      <tr><td><code>verifySave</code></td><td>保存前検証。不一致の一覧を返す</td></tr>
+      <tr><td><code>prepareSave(doc, edits, options)</code></td><td>パッチ生成→適用→検証→次の正本の構築までをまとめて行う。結果は成功（新ソース・パッチ・期待値・新文書）か、エラーコード付きの失敗</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>@mend/editor</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>API</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>createEditor({ container, document, onShortcut })</code></td><td>編集ビューを作る。<code>MendEditor</code> を返す</td></tr>
+      <tr><td><code>getState</code> / <code>subscribe</code></td><td>状態（読み取り専用の理由、変更一覧、Undo/Redo 可否、検索状態、カーソル位置）の取得と購読</td></tr>
+      <tr><td><code>undo</code> / <code>redo</code></td><td>自前履歴による Undo / Redo</td></tr>
+      <tr><td><code>revertChange</code> / <code>revealChange</code></td><td>変更の個別取り消しと該当箇所への移動</td></tr>
+      <tr><td><code>revealPath(path)</code></td><td>検証エラーのパスが指す要素へスクロール</td></tr>
+      <tr><td><code>find</code> / <code>findNext</code> / <code>findPrevious</code> / <code>clearFind</code></td><td>検索</td></tr>
+      <tr><td><code>prepareSave</code> / <code>commitSave</code></td><td>保存の準備（何も変えない）と、書き込み成功後の再同期</td></tr>
+      <tr><td><code>getDocument</code> / <code>focus</code> / <code>destroy</code></td><td>現在の正本の取得、フォーカス、破棄</td></tr>
+      <tr><td><code>createPreview(container)</code></td><td>スクリプト有効のプレビュー（<code>show(source)</code> / <code>destroy()</code>）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>apps/web</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>モジュール</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>App.tsx</code></td><td>画面の切り替え、ファイルを開く（選択・ドロップ・最近）、未保存警告、ウィンドウタイトル、<kbd>Ctrl+O</kbd></td></tr>
+      <tr><td><code>components/StartScreen.tsx</code></td><td>起動画面（ドロップ先、開くボタン、最近開いたファイル）</td></tr>
+      <tr><td><code>components/EditorScreen.tsx</code></td><td>編集画面（ヘッダー、編集／プレビュー、保存フロー、外部更新・保存中止ダイアログ、トースト、ステータスバー）</td></tr>
+      <tr><td><code>components/ChangeList.tsx</code></td><td>変更箇所一覧</td></tr>
+      <tr><td><code>components/SearchBar.tsx</code></td><td>検索バー</td></tr>
+      <tr><td><code>components/Dialog.tsx</code></td><td>確認・エラーダイアログとトースト</td></tr>
+      <tr><td><code>lib/fileAdapter.ts</code></td><td>File System Access API の <code>FileAdapter</code>（デスクトップ版では別の実装に差し替える想定）</td></tr>
+      <tr><td><code>lib/recentFiles.ts</code></td><td>最近開いたファイル（IndexedDB）</td></tr>
+      <tr><td><code>lib/messages.ts</code></td><td>エラーコードから日本語の文言を作る</td></tr>
+      <tr><td><code>lib/format.ts</code></td><td>日付・改行コード・文字コード・見えない文字・カーソル位置の表示用の整形</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<footer>
+  ソースコード（<code>packages/core</code>, <code>packages/editor</code>, <code>apps/web</code>）と <code>docs/requirements.md</code> をもとに作成。2026年11月23日時点（コミット 6b86f1e）。
+</footer>
+
+</div>
+</body>
+</html>

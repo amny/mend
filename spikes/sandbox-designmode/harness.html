@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>spike: sandbox + designMode</title></head>
+<body>
+<div id="host"></div>
+<script>
+// Parent-side harness. All logic runs in the parent realm; the iframe never runs scripts.
+window.log = [];
+window.mutations = [];
+window.messages = [];
+window.__ran = 0;
+window.addEventListener('message', (e) => window.messages.push(e.data));
+
+window.mount = (source, { mode, sandbox, csp }) => new Promise((resolve) => {
+  const host = document.getElementById('host');
+  host.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('sandbox', sandbox);
+  if (csp) iframe.setAttribute('csp', csp);
+  iframe.style.width = '800px';
+  iframe.style.height = '400px';
+  iframe.addEventListener('load', () => resolve(true), { once: true });
+  if (mode === 'blob') {
+    iframe.src = URL.createObjectURL(new Blob([source], { type: 'text/html;charset=utf-8' }));
+  } else {
+    iframe.srcdoc = source;
+  }
+  host.appendChild(iframe);
+  window.frameEl = iframe;
+});
+
+window.inspect = () => {
+  const doc = window.frameEl.contentDocument;
+  if (!doc) return { accessible: false };
+  const ns = doc.querySelector('noscript');
+  return {
+    accessible: true,
+    url: doc.URL,
+    compatMode: doc.compatMode,
+    noscriptHasElementChild: !!(ns && ns.firstElementChild),
+    pInsideTable: !!doc.querySelector('p > table'),
+    styleApplied: getComputedStyle(doc.getElementById('t1')).color,
+  };
+};
+
+window.enableEditing = ({ guard }) => {
+  const doc = window.frameEl.contentDocument;
+  doc.designMode = 'on';
+  const L = window.log;
+  doc.addEventListener('keydown', (e) => L.push(['keydown', e.key, e.ctrlKey || e.metaKey]));
+  doc.addEventListener('compositionstart', (e) => L.push(['compositionstart', e.data]));
+  doc.addEventListener('compositionupdate', (e) => L.push(['compositionupdate', e.data]));
+  doc.addEventListener('compositionend', (e) => L.push(['compositionend', e.data]));
+  doc.addEventListener('input', (e) => L.push(['input', e.inputType, e.isComposing]));
+  doc.addEventListener('beforeinput', (e) => {
+    const ranges = e.getTargetRanges().map((r) => ({
+      sc: r.startContainer.nodeName, so: r.startOffset,
+      ec: r.endContainer.nodeName, eo: r.endOffset,
+      sameNode: r.startContainer === r.endContainer,
+    }));
+    L.push(['beforeinput', e.inputType, ranges, e.cancelable]);
+    if (!guard) return;
+    const block = ['insertParagraph', 'insertLineBreak', 'insertFromDrop', 'deleteByDrag'];
+    if (block.includes(e.inputType) || e.inputType.startsWith('format')) { e.preventDefault(); return; }
+    if (e.inputType.startsWith('delete') && ranges.some((r) => !r.sameNode)) { e.preventDefault(); return; }
+    // Deletion that would empty a text node: do it ourselves.
+    if (e.inputType.startsWith('delete') && e.getTargetRanges().length === 1) {
+      const r = e.getTargetRanges()[0];
+      const n = r.startContainer;
+      if (n.nodeType === 3 && r.startOffset === 0 && r.endOffset === n.data.length) {
+        e.preventDefault();
+        n.data = '';
+        L.push(['custom-empty']);
+      }
+    }
+  });
+  const mo = new MutationObserver((recs) => {
+    for (const r of recs) window.mutations.push([r.type, r.target.nodeName, r.addedNodes.length, r.removedNodes.length]);
+  });
+  mo.observe(doc, { subtree: true, childList: true, characterData: true, attributes: true });
+  window.mo = mo;
+};
+
+window.selectText = (id, start, endId, end) => {
+  const doc = window.frameEl.contentDocument;
+  const textOf = (el) => {
+    const w = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    return w.nextNode();
+  };
+  const lastText = (el) => {
+    const w = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n, last = null; while ((n = w.nextNode())) last = n; return last;
+  };
+  const a = textOf(doc.getElementById(id));
+  const b = endId ? lastText(doc.getElementById(endId)) : a;
+  const range = doc.createRange();
+  range.setStart(a, start === 'end' ? a.data.length : start);
+  range.setEnd(b, end === undefined ? range.startOffset : end === 'end' ? b.data.length : end);
+  const sel = doc.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  window.frameEl.contentWindow.focus();
+};
+
+window.html = (id) => window.frameEl.contentDocument.getElementById(id).innerHTML;
+
+window.tryHighlight = () => {
+  const win = window.frameEl.contentWindow;
+  const doc = window.frameEl.contentDocument;
+  const before = window.mutations.length;
+  const t = doc.getElementById('t1').firstChild;
+  const range = new win.Range();
+  range.setStart(t, 0); range.setEnd(t, 5);
+  const hl = new win.Highlight(range);
+  win.CSS.highlights.set('mend-changed', hl);
+  const sheet = new win.CSSStyleSheet();
+  sheet.replaceSync('::highlight(mend-changed){background:#FFE08A}');
+  doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet];
+  return {
+    highlightSize: win.CSS.highlights.size,
+    adopted: doc.adoptedStyleSheets.length,
+    styleElementsInDom: doc.querySelectorAll('style').length,
+    mutationsCaused: window.mutations.length - before,
+  };
+};
+</script>
+</body>
+</html>

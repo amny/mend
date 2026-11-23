@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>実体参照 &amp; 文字参照</title>
+</head>
+<body>
+  <h1 title="A&amp;B &quot;quoted&quot;">実体参照 &amp; 文字参照</h1>
+  <p id="named">Tom &amp; Jerry、&lt;tag&gt;、&quot;quote&quot;、&apos;apos&apos;</p>
+  <p id="nbsp">単語&nbsp;単語、連続&nbsp;&nbsp;&nbsp;空白、末尾&nbsp;</p>
+  <p id="numeric">10進 &#12354; と 16進 &#x3042; と 大文字X &#X3044; と ゼロ埋め &#0012356;</p>
+  <p id="legacy">セミコロンなし &copy 2026 &amp だけ、直後に文字 &copyright と &notin; と &not;</p>
+  <p id="raw">素の &amp;記号: AT&T、R&D、a & b、&unknown;</p>
+  <p id="upper">大文字 &AMP; と &COPY; と &LT;</p>
+  <p id="astral">サロゲート &#x1F600; と &#128512;</p>
+  <p id="mixed">あ&amp;い&nbsp;う&#x3048;え&copyお</p>
+  <p id="edge-start">&amp;先頭と末尾&amp;</p>
+  <p><a href="?a=1&amp;b=2&c=3">リンク &amp; 属性</a></p>
+</body>
+</html>
