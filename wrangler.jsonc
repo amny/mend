@@ -1,0 +1,9 @@
+// Cloudflare Workers: serves the built apps/web as static assets (no Worker script).
+// Build with `pnpm build` at the repository root before `wrangler deploy`.
+{
+  "name": "mend",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./apps/web/dist",
+  },
+}
